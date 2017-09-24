@@ -8,42 +8,45 @@ Created on Sat Sep 23 22:34:38 2017
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn import datasets, linear_model
+from sklearn.metrics import mean_squared_error, r2_score
 
-# 读取自带的diabete数据集
+#导入糖尿病数据
 diabetes = datasets.load_diabetes()
 
-
-# 使用其中的一个feature
+#只使用一个特征     np.newaxis相当于None
 diabetes_X = diabetes.data[:, np.newaxis, 2]
 
-# 将数据集分割成training set和test set
+#将数据分为训练和测试集
 diabetes_X_train = diabetes_X[:-20]
 diabetes_X_test = diabetes_X[-20:]
 
-# 将目标（y值）分割成training set和test set
+#将目标集分为训练和测试集
 diabetes_y_train = diabetes.target[:-20]
 diabetes_y_test = diabetes.target[-20:]
 
-# 使用线性回归
-regr = linear_model.LinearRegression()
+#创建线性回归对象
+reg = linear_model.LinearRegression()
 
-# 进行training set和test set的fit，即是训练的过程
-regr.fit(diabetes_X_train, diabetes_y_train)
+#用训练集训练模型
+reg.fit(diabetes_X_train, diabetes_y_train)
 
-# 打印出相关系数和截距等信息
-print('Coefficients: \n', regr.coef_)
-# The mean square error
-print("Residual sum of squares: %.2f"
-      % np.mean((regr.predict(diabetes_X_test) - diabetes_y_test) ** 2))
-# Explained variance score: 1 is perfect prediction
-print('Variance score: %.2f' % regr.score(diabetes_X_test, diabetes_y_test))
+#使用测试集做预测
+diabetes_y_pred = reg.predict(diabetes_X_test)
 
-# 使用pyplot画图
-plt.scatter(diabetes_X_test, diabetes_y_test,  color='black')
-plt.plot(diabetes_X_test, regr.predict(diabetes_X_test), color='blue',
-         linewidth=3)
+#输出系数
+print 'Coefficients: ', reg.coef_
 
-plt.xticks(())
-plt.yticks(())
+#均方误差
+print 'Mean squared error: %.2f' %mean_squared_error(diabetes_y_test, diabetes_y_pred)
+
+#方差值，越接近1表面预测越好
+print 'Variance score: %.2f' %r2_score(diabetes_y_test, diabetes_y_pred)
+
+#画输出图
+plt.scatter(diabetes_X_test, diabetes_y_test, c='k')
+plt.plot(diabetes_X_test, diabetes_y_pred, c='b')
+
+plt.xticks()
+plt.yticks()
 
 plt.show()
